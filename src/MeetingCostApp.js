@@ -3,7 +3,8 @@ import {
     BrowserRouter as Router,
     Route,
     Link,
-    Switch
+    Switch,
+    Redirect
 } from 'react-router-dom';
 
 import AppBar from 'material-ui/AppBar';
@@ -103,6 +104,8 @@ class App extends Component {
                         <MenuItem containerElement={<Link to="/join" />} onClick={this.handleClose}>Join meeting</MenuItem>
                         <MenuItem containerElement={<Link to="/user" />} onClick={this.handleClose}>Edit user</MenuItem>
                     </Drawer>
+
+                    { !this.state.userExists ? <Redirect to="/user"/> : "" }
                 
                     <Switch>
                         <Route exact path="/" component={this.Home} />
