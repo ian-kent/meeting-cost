@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import {Redirect} from 'react-router';
 import QrReader from 'react-qr-reader'
 
 class Scanner extends Component {
@@ -6,7 +7,7 @@ class Scanner extends Component {
         super(props)
         this.state = {
             delay: 100,
-            result: 'No result',
+            result: null,
         }
 
         this.handleScan = this.handleScan.bind(this)
@@ -26,6 +27,7 @@ class Scanner extends Component {
         }
 
         return(
+            !this.state.result ?
             <div>
             <QrReader
                 delay={this.state.delay}
@@ -33,8 +35,8 @@ class Scanner extends Component {
                 onError={this.handleError}
                 onScan={this.handleScan}
                 />
-            <p>{this.state.result}</p>
-            </div>
+            </div> :
+            <Redirect to={"/meeting/" + this.state.result}/>
         )
     }
 }

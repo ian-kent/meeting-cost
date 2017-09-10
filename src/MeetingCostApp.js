@@ -12,10 +12,10 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
 
-import Scanner from './Scanner';
 import UserEditor from './components/UserEditor';
 import CreateMeeting from './components/CreateMeeting';
 import ViewMeeting from './components/ViewMeeting';
+import JoinMeeting from './components/JoinMeeting';
 
 import uuidv4 from 'uuid/v4';
 
@@ -110,6 +110,7 @@ class App extends Component {
                     <Switch>
                         <Route exact path="/" component={this.Home} />
                         <Route exact path="/user" component={this.User} />
+                        <Route exact path="/join" component={JoinMeeting} />
                         <Route exact path="/create" render={ props => (
                             <CreateMeeting user={ this.state.user } />
                         )} />
