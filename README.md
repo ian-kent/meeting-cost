@@ -1,7 +1,7 @@
 meeting-cost
 ============
 
-https://bit.ly/meeeting-cost-app
+https://bit.ly/meeting-cost-app
 
 ## to run locally
 
