@@ -44,7 +44,8 @@ class App extends Component {
 
     Home() {
         return <div>
-            
+            <RaisedButton containerElement={<Link to="/create" />} type="submit" label="Create meeting" primary={true} />
+            <RaisedButton containerElement={<Link to="/join" />} type="submit" label="Join meeting" primary={false} />
         </div>;
     };
 
