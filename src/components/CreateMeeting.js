@@ -26,7 +26,10 @@ class CreateMeeting extends Component {
         event.preventDefault();
         //this.props.userCreated(this.state);
         const meeting = {
-            user: this.props.user,
+            user: {
+                id: this.props.user.id,
+                name: this.props.user.name
+            },
             name: this.state.name
         }
         fetch('https://l6w6ou7rnb.execute-api.eu-west-1.amazonaws.com/prod/meetings', {

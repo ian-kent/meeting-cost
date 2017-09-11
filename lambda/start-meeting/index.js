@@ -11,10 +11,16 @@ exports.handler = (event, context, callback) => {
         TableName : 'MeetingCostMeetings',
         Key: {
           ID: meetingId
+        },
+        AttributeUpdates: {
+            Started: {
+                Action: 'PUT',
+                Value: (new Date()).toString()
+            }
         }
     };
 
-    dynamodb.get(params, function(err, data) {
+    dynamodb.update(params, function(err, data) {
         if (err) {
             console.log(err);
 
@@ -32,42 +38,13 @@ exports.handler = (event, context, callback) => {
         else {
             console.log(data);
 
-            if (!data.hasOwnProperty("Item")) {
-                const result = {
-                    "isBase64Encoded": false,
-                    "statusCode": 404,
-                    "headers": { 
-                        "Content-Type": "application/json",
-                        "Access-Control-Allow-Origin": "*"
-                    }
-                };
-    
-                callback(null, result);
-
-                return;
-            }
-
-            const meeting = {
-                id: meetingId,
-                name: data.Item.Name,
-                created: data.Item.Created,
-                started: data.Item.Started,
-                ended: data.Item.Ended,
-                user: {
-                    name: data.Item.User.name,
-                    rate: data.Item.User.rate,
-                    id: data.Item.User.id
-                }
-            }
-
             const result = {
                 "isBase64Encoded": false,
                 "statusCode": 200,
                 "headers": { 
                     "Content-Type": "application/json",
                     "Access-Control-Allow-Origin": "*"
-                },
-                "body": JSON.stringify(meeting)
+                }
             };
 
             callback(null, result);
