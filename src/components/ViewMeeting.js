@@ -35,7 +35,10 @@ class ViewMeeting extends Component {
                 console.log(meeting.val());
                 const m = meeting.val();
 
-                const attendees = Object.keys(m.attendees).map((a) => m.attendees[a]);
+                let attendees = [];
+                if(m.attendees) {
+                    attendees = Object.keys(m.attendees).map((a) => m.attendees[a]);
+                }
                 console.log(attendees);
 
                 this.setState({
