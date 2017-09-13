@@ -36,8 +36,10 @@ class ViewMeeting extends Component {
                 const m = meeting.val();
 
                 let attendees = [];
+                let isAttending = false;
                 if(m.attendees) {
                     attendees = Object.keys(m.attendees).map((a) => m.attendees[a]);
+                    isAttending = m.user.id in m.attendees;
                 }
                 console.log(attendees);
 
@@ -53,7 +55,7 @@ class ViewMeeting extends Component {
                         },
                         attendees: attendees
                     },
-                    isAttending: (m.user.id in m.attendees),
+                    isAttending: isAttending,
                     loading: false
                 })
             });
