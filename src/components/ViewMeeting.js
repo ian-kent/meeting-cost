@@ -105,10 +105,14 @@ class ViewMeeting extends Component {
     }
     
     render(){
+        const qrStyle = {
+            padding: "10px"
+        };
+
         return(
             (!this.state.loading ? 
             <div>
-                <QRCode value={this.props.match.params.id} />
+                <QRCode style={qrStyle} value={this.props.match.params.id} />
                 <p>{this.state.meeting.name}</p>
                 <p>Created by {this.state.meeting.user.name} on {this.state.meeting.created}</p>
                 { 
