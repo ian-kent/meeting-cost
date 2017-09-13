@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 
 import { withRouter } from 'react-router-dom';
 
+import uuidv4 from 'uuid/v4';
+
 class CreateMeeting extends Component {
     constructor(props){
         super(props)
@@ -24,28 +26,39 @@ class CreateMeeting extends Component {
 
     handleSubmit(event) {
         event.preventDefault();
-        //this.props.userCreated(this.state);
-        const meeting = {
-            user: {
-                id: this.props.user.id,
-                name: this.props.user.name
-            },
-            name: this.state.name
-        }
-        fetch('https://l6w6ou7rnb.execute-api.eu-west-1.amazonaws.com/prod/meetings', {
-            method: 'post',
-            headers: {
-              'Accept': 'application/json, text/plain, */*',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(meeting)
-        }).then(res=>res.json())
-        .then(res => {
-            console.log(res);
-            this.props.history.push("/meeting/" + res.id);
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
+
+        const uid = uuidv4();
+        const email = uid + "@meeting-cost.ian-kent.github.io";
+        window.firebase.auth().createUserWithEmailAndPassword(email, uid).then(() => {
+            console.log('Created user ', email);
+            window.firebase.auth().signOut();
+            window.firebase.auth().signInWithEmailAndPassword(email, uid).then((userData) => {
+                console.log(userData);
+
+                const meeting = {
+                    uid: userData.uid,
+                    name: this.state.name,
+                    created: (new Date()).toString(),
+                    user: {
+                        id: this.props.user.id,
+                        name: this.props.user.name
+                    }
+                };
+
+                window.firebase.database().ref('/meetings/' + uid).set(meeting, (error) => {
+                    if (error) {
+                        console.log('Error creating meeting: ', error);
+                        return;
+                    }
+
+                    console.log('Created meeting ', uid);
+                    this.props.history.push("/meeting/" + uid);
+                });
+            }, (error) => {
+                console.log('User login failed: ', error);
+            })
+        }, (error) => {
+            console.log('Create user failed: ', error);
         });
     }
     

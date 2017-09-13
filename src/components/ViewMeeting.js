@@ -9,71 +9,75 @@ class ViewMeeting extends Component {
         super(props)
         this.state = {
             meeting: null,
-            loading: true
+            loading: true,
+            isAttending: false
         }
 
         this.startMeeting = this.startMeeting.bind(this);
-        this.updateMeeting = this.updateMeeting.bind(this);
         this.endMeeting = this.endMeeting.bind(this);
         this.attendMeeting = this.attendMeeting.bind(this);
     }
 
     componentWillMount() {
-        this.updateMeeting(this.props.match.params.id);
-    }
+        const uid = this.props.match.params.id;
+        const email = uid + "@meeting-cost.ian-kent.github.io";
+        window.firebase.auth().signOut();
+        window.firebase.auth().signInWithEmailAndPassword(email, uid).then((userData) => {
+            console.log(userData);
 
-    updateMeeting(meetingId) {
-        fetch('https://l6w6ou7rnb.execute-api.eu-west-1.amazonaws.com/prod/meetings/' + meetingId, {
-            method: 'get',
-            headers: {
-              'Accept': 'application/json, text/plain, */*',
-              'Content-Type': 'application/json'
-            }
-        }).then(res=>res.json())
-        .then(res => {
-            console.log(res);
-            this.setState({meeting: Object.assign({}, res), loading: false});
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
+            window.firebase.database().ref('/meetings/' + uid).on('value', (meeting) => {
+                if (meeting.val() === null) {
+                    console.log("meeting value is null");
+                    this.props.history.push("/create");
+                    return;
+                }
+
+                console.log(meeting.val());
+                const m = meeting.val();
+
+                const attendees = Object.keys(m.attendees).map((a) => m.attendees[a]);
+                console.log(attendees);
+
+                this.setState({
+                    meeting: {
+                        name: m.name,
+                        created: m.created,
+                        started: m.started,
+                        ended: m.ended,
+                        user: {
+                            name: m.user.name,
+                            id: m.user.id
+                        },
+                        attendees: attendees
+                    },
+                    isAttending: (m.user.id in m.attendees),
+                    loading: false
+                })
+            });
         });
     }
 
     startMeeting() {
-        console.log("starting meeting");
         const meetingId = this.props.match.params.id;
-        fetch('https://l6w6ou7rnb.execute-api.eu-west-1.amazonaws.com/prod/meetings/' + meetingId + '/start', {
-            method: 'post',
-            headers: {
-              'Accept': 'application/json, text/plain, */*',
-              'Content-Type': 'application/json'
+        console.log("starting meeting");
+        window.firebase.database().ref("/meetings/" + meetingId + "/started").set(new Date().toString(), (error) => {
+            if(error) {
+                console.log("error starting meeting ", error);
+                return;
             }
-        })
-        .then(res => {
-            console.log(res);
-            this.updateMeeting(meetingId);
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
+            console.log("meeting started");
         });
     }
 
     endMeeting() {
-        console.log("ending meeting");
         const meetingId = this.props.match.params.id;
-        fetch('https://l6w6ou7rnb.execute-api.eu-west-1.amazonaws.com/prod/meetings/' + meetingId + '/end', {
-            method: 'post',
-            headers: {
-              'Accept': 'application/json, text/plain, */*',
-              'Content-Type': 'application/json'
+        console.log("ending meeting");
+        window.firebase.database().ref("/meetings/" + meetingId + "/ended").set(new Date().toString(), (error) => {
+            if(error) {
+                console.log("error ending meeting ", error);
+                return;
             }
-        })
-        .then(res => {
-            console.log(res);
-            this.updateMeeting(meetingId);
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
+            console.log("meeting ended");
         });
     }
 
@@ -81,26 +85,17 @@ class ViewMeeting extends Component {
         console.log("attend meeting");
         const meetingId = this.props.match.params.id;
         const user = {
-            user: {
-                id: this.props.user.id,
-                name: this.props.user.name,
-                rate: this.props.user.rate
-            }
+            id: this.props.user.id,
+            name: this.props.user.name,
+            rate: this.props.user.rate,
+            joined: (new Date()).toString()
         }
-        fetch('https://l6w6ou7rnb.execute-api.eu-west-1.amazonaws.com/prod/meetings/' + meetingId + '/attend', {
-            method: 'post',
-            headers: {
-              'Accept': 'application/json, text/plain, */*',
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(user)
-        })
-        .then(res => {
-            console.log(res);
-            this.updateMeeting(meetingId);
-        })
-        .catch(function(error) {
-            console.log('There has been a problem with your fetch operation: ' + error.message);
+        window.firebase.database().ref("/meetings/" + meetingId + "/attendees/" + this.props.user.id).set(user, (error) => {
+            if(error) {
+                console.log("error attending meeting ", error);
+                return;
+            }
+            console.log("meeting attended");
         });
     }
     
@@ -124,10 +119,15 @@ class ViewMeeting extends Component {
                     </div>
                 }
                 {
-                    !this.state.meeting.ended ?
+                    !this.state.meeting.ended && !this.state.isAttending ?
                     <RaisedButton onClick={this.attendMeeting} type="submit" label="Attend meeting" primary={true} /> :
                     ""
                 }
+                <ul>
+                    {
+                        this.state.meeting.attendees.map((a) => <li key={a.id}>{a.name}</li>)
+                    }
+                </ul>
             </div> :
             <div>
                 Loading

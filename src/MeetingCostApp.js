@@ -113,9 +113,11 @@ class App extends Component {
                         <Route exact path="/user" component={this.User} />
                         <Route exact path="/join" component={JoinMeeting} />
                         <Route exact path="/create" render={ props => (
-                            <CreateMeeting user={ this.state.user } />
+                            <CreateMeeting user={this.state.user} />
                         )} />
-                        <Route exact path="/meeting/:id" component={ViewMeeting} />
+                        <Route exact path="/meeting/:id" render={ props => (
+                            <ViewMeeting user={this.state.user} />
+                        )} />
                         <Route>
                             <div>Page not found</div>
                         </Route>

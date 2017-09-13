@@ -4,10 +4,6 @@ import { withRouter } from 'react-router-dom';
 import Scanner from './Scanner';
 
 class JoinMeeting extends Component {
-    constructor(props){
-        super(props)
-    }
-
     render(){
         return(
             <Scanner />
