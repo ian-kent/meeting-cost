@@ -46,15 +46,10 @@ class App extends Component {
         this.handleClose = this.handleClose.bind(this);
 
         this.Home = this.Home.bind(this);
-        this.User = this.User.bind(this);
     };
 
     Home() {
         return <div></div>;
-    };
-
-    User() {
-        return <UserEditor name={this.state.user.name} rate={this.state.user.rate} saveUser={this.saveUser} />;
     };
 
     componentWillMount() {
@@ -131,7 +126,14 @@ class App extends Component {
                             <Route exact path="/" render={ props => (
                                 <Redirect to="/create"/>
                             )} />
-                            <Route exact path="/user" component={this.User} />
+                            <Route exact path="/user" render={ props => (
+                                <UserEditor 
+                                    name={this.state.user.name}
+                                    rate={this.state.user.rate}
+                                    saveUser={this.saveUser}
+                                    userExists={this.state.userExists}
+                                />
+                            )} />
                             <Route exact path="/join" component={JoinMeeting} />
                             <Route exact path="/create" render={ props => (
                                 <CreateMeeting user={this.state.user} />

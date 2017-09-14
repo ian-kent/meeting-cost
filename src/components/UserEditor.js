@@ -33,9 +33,22 @@ class UserEditor extends Component {
     render(){
         return(
             <form onSubmit={this.handleSubmit}>
-                <TextField floatingLabelText="Name" type="text" name="name" value={this.state.name} onChange={this.handleInputChange} />
-                <TextField floatingLabelText="Rate" type="number" name="rate" value={this.state.rate} onChange={this.handleInputChange} />
-                <RaisedButton type="submit" label="Save" primary={true} />
+                <p>
+                {
+                    this.props.userExists ?
+                    "This data is stored locally. It won't be shared without your permission." :
+                    "Set your name and rate to get started. This data is stored locally, and won't be shared without your permission."
+                }
+                </p>
+                <div>
+                    <TextField floatingLabelText="Name" type="text" name="name" value={this.state.name} onChange={this.handleInputChange} />
+                </div>
+                <div>
+                    <TextField floatingLabelText="Rate" type="number" name="rate" value={this.state.rate} onChange={this.handleInputChange} />
+                </div>
+                <div>
+                    <RaisedButton type="submit" label="Save" primary={true} />
+                </div>
             </form>
         )
     }
@@ -43,7 +56,8 @@ class UserEditor extends Component {
 
 UserEditor.propTypes = {
     name: PropTypes.string,
-    rate: PropTypes.number
+    rate: PropTypes.number,
+    userExists: PropTypes.boolean
 };
 
 const UserEditorWithRouter = withRouter(UserEditor);
