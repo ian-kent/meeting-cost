@@ -3,6 +3,23 @@ import { withRouter } from 'react-router-dom';
 
 import QRCode from 'qrcode.react';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
+
+import Avatar from 'material-ui/Avatar';
+import Chip from 'material-ui/Chip';
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+
+import ActionToday from 'material-ui/svg-icons/action/today';
+
+const styles = {
+    chip: {
+        margin: 4,
+    },
+    wrapper: {
+        display: 'flex',
+        flexWrap: 'wrap',
+    },
+};
 
 class ViewMeeting extends Component {
     constructor(props){
@@ -42,7 +59,8 @@ class ViewMeeting extends Component {
                 let isAttending = false;
                 if(m.attendees) {
                     attendees = Object.keys(m.attendees).map((a) => m.attendees[a]);
-                    isAttending = m.user.id in m.attendees;
+                    isAttending = this.props.user.id in m.attendees;
+                    console.log(isAttending);
                 }
                 console.log(attendees);
 
@@ -144,40 +162,57 @@ class ViewMeeting extends Component {
     
     render(){
         const qrStyle = {
-            padding: "10px"
+            padding: "10px",
         };
 
         return(
             (!this.state.loading ? 
             <div>
-                <h1>{this.state.meeting.name}</h1>
-                <div style={qrStyle}>
-                    <QRCode value={this.props.match.params.id} />
-                </div>
-                <p>Cost: {this.state.cost}</p>
-                <p>Created by {this.state.meeting.user.name} on {this.state.meeting.created}</p>
-                { 
-                    !this.state.meeting.started ? 
-                    <RaisedButton onClick={this.startMeeting} type="submit" label="Start meeting" primary={true} /> : 
-                    <div>
-                        <p>Started on {this.state.meeting.started}</p>
+                <Card>
+                    <CardTitle title={this.state.meeting.name} 
+                        subtitle={"Created by " + this.state.meeting.user.name + " on " + this.state.meeting.created}
+                    />
+                    <CardText>
+                        <div style={qrStyle}>
+                            <QRCode size="196" value={this.props.match.params.id} />
+                        </div>
+                        <div>
+                            {
+                                this.state.meeting.started ?
+                                <p>Started on { this.state.meeting.started }</p> :
+                                ""
+                            }
+                            {
+                                this.state.meeting.ended ?
+                                <p>Finished on { this.state.meeting.ended }</p> :
+                                ""
+                            }
+                        </div>
+                        <p>Cost: {this.state.cost}</p>
+                        <div style={styles.wrapper}>
+                            {
+                                this.state.meeting.attendees.map((a) =>
+                                <Chip style={styles.chip} key={a.id}>
+                                    <Avatar size={32}>{ a.name.charAt(0) }</Avatar>
+                                    { a.name }
+                                </Chip>
+                                )
+                            }
+                        </div>
+                    </CardText>
+                    <CardActions>
                         {
-                            !this.state.meeting.ended ?
-                            <RaisedButton onClick={this.endMeeting} type="submit" label="End meeting" primary={true} /> :
-                            <p>Ended on {this.state.meeting.ended}</p>
+                            !this.state.meeting.started ?
+                            <RaisedButton onClick={this.startMeeting} type="submit" label="Start meeting" primary={true} /> : 
+                            <RaisedButton onClick={this.endMeeting} type="submit" label="End meeting" primary={true} />
                         }
-                    </div>
-                }
-                {
-                    !this.state.meeting.ended && !this.state.isAttending ?
-                    <RaisedButton onClick={this.attendMeeting} type="submit" label="Attend meeting" primary={true} /> :
-                    ""
-                }
-                <ul>
-                    {
-                        this.state.meeting.attendees.map((a) => <li key={a.id}>{a.name} (joined {a.joined})</li>)
-                    }
-                </ul>
+                        {
+                            !this.state.meeting.ended && !this.state.isAttending ?
+                            <RaisedButton onClick={this.attendMeeting} type="submit" label="Attend meeting" primary={true} /> :
+                            ""
+                        }
+                    </CardActions>
+                </Card>
             </div> :
             <div>
                 Loading
