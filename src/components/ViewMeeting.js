@@ -67,29 +67,22 @@ class ViewMeeting extends Component {
     }
 
     calculateCost() {
-        console.log("calculating cost");
-
         if(!this.state.meeting.started) {
             console.log("meeting not started");
             this.setState({cost: Number(0).toLocaleString("en-GB", {style:"currency", currency:"GBP"})});
             return;
         }        
 
-        let cost = 0;
-        const now = new Date();
         const started = new Date(this.state.meeting.started);
         const ended = this.state.meeting.ended ? new Date(this.state.meeting.ended) : null;
 
+        let cost = 0;
         for(let u in this.state.meeting.attendees) {
             const attendee = this.state.meeting.attendees[u];
-            console.log("found attendee");
-            console.log(attendee);
-
             const joined = new Date(attendee.joined);
             cost += this.calculateAttendeeCost(attendee.rate, started, ended, joined);
         }
 
-        console.log("moo");
         this.setState({cost: cost.toLocaleString("en-GB", {style:"currency", currency:"GBP"})});
 
         if(!this.state.meeting.ended) {
