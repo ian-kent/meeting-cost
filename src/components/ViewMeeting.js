@@ -204,7 +204,9 @@ class ViewMeeting extends Component {
                         {
                             !this.state.meeting.started ?
                             <RaisedButton onClick={this.startMeeting} type="submit" label="Start meeting" primary={true} /> : 
-                            <RaisedButton onClick={this.endMeeting} type="submit" label="End meeting" primary={true} />
+                            ( !this.state.meeting.ended ?
+                            <RaisedButton onClick={this.endMeeting} type="submit" label="End meeting" primary={true} /> :
+                            "" )
                         }
                         {
                             !this.state.meeting.ended && !this.state.isAttending ?
