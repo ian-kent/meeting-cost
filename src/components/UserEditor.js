@@ -33,13 +33,32 @@ class UserEditor extends Component {
     render(){
         return(
             <form onSubmit={this.handleSubmit}>
-                <p>
+                <h1>
+                    {
+                        this.props.userExists ?
+                        "Edit user" :
+                        "Setup user"
+                    }
+                </h1>
                 {
                     this.props.userExists ?
-                    "This data is stored locally. It won't be shared without your permission." :
-                    "Set your name and rate to get started. This data is stored locally, and won't be shared without your permission."
+                    <div>
+                        <p>
+                            This data is stored locally.
+                        </p>
+                        <p>
+                            It won't be shared without your permission.
+                        </p>
+                    </div> :
+                    <div>
+                        <p>
+                            Set your name and rate to get started.
+                        </p>
+                        <p>
+                            This data is stored locally, and won't be shared without your permission.
+                        </p>
+                    </div>
                 }
-                </p>
                 <div>
                     <TextField floatingLabelText="Name" type="text" name="name" value={this.state.name} onChange={this.handleInputChange} />
                 </div>

@@ -5,6 +5,8 @@ import PropTypes from 'prop-types';
 
 import { withRouter } from 'react-router-dom';
 
+import { Link } from 'react-router-dom';
+
 import uuidv4 from 'uuid/v4';
 
 class CreateMeeting extends Component {
@@ -65,13 +67,24 @@ class CreateMeeting extends Component {
     render(){
         return(
             <div>
-            <p>
-                Creating meeting as { this.props.user.name }
-            </p>
-            <form onSubmit={this.handleSubmit}>
-                <TextField floatingLabelText="Meeting name" type="text" name="name" value={this.state.name} onChange={this.handleInputChange} />
-                <RaisedButton type="submit" label="Create" primary={true} />
-            </form>
+                <h1>Create a meeting</h1>
+                <p>
+                    Your rate will not be shared.
+                </p>
+                <p>
+                    You can also <Link to="/join">join a meeting</Link>.
+                </p>
+                <form onSubmit={this.handleSubmit}>
+                    <div>
+                        <TextField floatingLabelText="User" type="text" name="name" disabled={true} value={this.props.user.name} />
+                    </div>
+                    <div>
+                        <TextField floatingLabelText="Meeting name" type="text" name="name" value={this.state.name} onChange={this.handleInputChange} />
+                    </div>
+                    <div>
+                        <RaisedButton type="submit" label="Create" primary={true} />
+                    </div>
+                </form>
             </div>
         )
     }

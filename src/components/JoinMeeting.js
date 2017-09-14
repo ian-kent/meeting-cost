@@ -6,7 +6,12 @@ import Scanner from './Scanner';
 class JoinMeeting extends Component {
     render(){
         return(
-            <Scanner />
+            <div>
+                <h1>Join a meeting</h1>
+                <p>Scan a QR code to join a meeting.</p>
+                <p>Your name and rate will not be shared.</p>
+                <Scanner />
+            </div>
         )
     }
 }
