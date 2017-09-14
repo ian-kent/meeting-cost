@@ -150,10 +150,10 @@ class ViewMeeting extends Component {
         return(
             (!this.state.loading ? 
             <div>
+                <h1>{this.state.meeting.name}</h1>
                 <div style={qrStyle}>
                     <QRCode value={this.props.match.params.id} />
                 </div>
-                <p>{this.state.meeting.name}</p>
                 <p>Cost: {this.state.cost}</p>
                 <p>Created by {this.state.meeting.user.name} on {this.state.meeting.created}</p>
                 { 

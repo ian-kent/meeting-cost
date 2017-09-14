@@ -124,7 +124,9 @@ class App extends Component {
                     <div style={{marginTop: 48, marginBottom: 48, marginLeft: 72, marginRight: 72}}>
                         <Switch>
                             <Route exact path="/" render={ props => (
-                                <Redirect to="/create"/>
+                                this.state.userExists ? 
+                                <Redirect to="/create"/> :
+                                <div></div>
                             )} />
                             <Route exact path="/user" render={ props => (
                                 <UserEditor 
