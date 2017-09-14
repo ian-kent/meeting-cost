@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import QRCode from 'qrcode.react';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
@@ -28,14 +29,17 @@ class ViewMeeting extends Component {
             meeting: null,
             loading: true,
             isAttending: false,
-            cost: 0
+            cost: 0,
+            confirmAttend: false
         }
 
         this.startMeeting = this.startMeeting.bind(this);
         this.endMeeting = this.endMeeting.bind(this);
         this.attendMeeting = this.attendMeeting.bind(this);
+        this.startAttendMeeting = this.startAttendMeeting.bind(this);
         this.calculateCost = this.calculateCost.bind(this);
         this.calculateAttendeeCost = this.calculateAttendeeCost.bind(this);
+        this.handleClose = this.handleClose.bind(this);
     }
 
     componentWillMount() {
@@ -142,7 +146,16 @@ class ViewMeeting extends Component {
         });
     }
 
+    startAttendMeeting() {
+        this.setState({confirmAttend: true});
+    }
+
+    handleClose() {
+        this.setState({confirmAttend: false});
+    }
+
     attendMeeting() {
+        this.setState({confirmAttend: false});
         console.log("attend meeting");
         const meetingId = this.props.match.params.id;
         const user = {
@@ -210,7 +223,29 @@ class ViewMeeting extends Component {
                         }
                         {
                             !this.state.meeting.ended && !this.state.isAttending ?
-                            <RaisedButton onClick={this.attendMeeting} type="submit" label="Attend meeting" primary={true} /> :
+                            <span>
+                            <RaisedButton onClick={this.startAttendMeeting} type="submit" label="Attend meeting" secondary={true} />
+                            <Dialog
+                                actions={[
+                                    <FlatButton
+                                        label="No, cancel"
+                                        primary={true}
+                                        onClick={this.handleClose}
+                                    />,
+                                    <FlatButton
+                                        label="Yes"
+                                        primary={true}
+                                        onClick={this.attendMeeting}
+                                    />
+                                ]}
+                                modal={false}
+                                open={this.state.confirmAttend}
+                                onRequestClose={this.handleClose}
+                            >
+                                <p>Attending a meeting will share your rate.</p>
+                                <p>Are you sure?</p>
+                            </Dialog> 
+                            </span> :
                             ""
                         }
                     </CardActions>
