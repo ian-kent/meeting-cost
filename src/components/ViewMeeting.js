@@ -10,12 +10,15 @@ class ViewMeeting extends Component {
         this.state = {
             meeting: null,
             loading: true,
-            isAttending: false
+            isAttending: false,
+            cost: 0
         }
 
         this.startMeeting = this.startMeeting.bind(this);
         this.endMeeting = this.endMeeting.bind(this);
         this.attendMeeting = this.attendMeeting.bind(this);
+        this.calculateCost = this.calculateCost.bind(this);
+        this.calculateAttendeeCost = this.calculateAttendeeCost.bind(this);
     }
 
     componentWillMount() {
@@ -58,14 +61,56 @@ class ViewMeeting extends Component {
                     isAttending: isAttending,
                     loading: false
                 })
+                setTimeout(() => {this.calculateCost()}, 0);
             });
         });
+    }
+
+    calculateCost() {
+        console.log("calculating cost");
+
+        if(!this.state.meeting.started) {
+            console.log("meeting not started");
+            this.setState({cost: Number(0).toLocaleString("en-GB", {style:"currency", currency:"GBP"})});
+            return;
+        }        
+
+        let cost = 0;
+        const now = new Date();
+        const started = new Date(this.state.meeting.started);
+        const ended = this.state.meeting.ended ? new Date(this.state.meeting.ended) : null;
+
+        for(let u in this.state.meeting.attendees) {
+            const attendee = this.state.meeting.attendees[u];
+            console.log("found attendee");
+            console.log(attendee);
+
+            const joined = new Date(attendee.joined);
+            cost += this.calculateAttendeeCost(attendee.rate, started, ended, joined);
+        }
+
+        console.log("moo");
+        this.setState({cost: cost.toLocaleString("en-GB", {style:"currency", currency:"GBP"})});
+
+        if(!this.state.meeting.ended) {
+            setTimeout(() => {this.calculateCost()}, 1000);
+        }
+    }
+
+    calculateAttendeeCost(rate, started, ended, joined) {
+        const rps = rate / 3600;
+        
+        const calcFrom = joined.getTime() > started.getTime() ? joined.getTime() : started.getTime();
+        const calcTo = ended ? ended.getTime() : new Date().getTime();
+
+        const seconds = (calcTo - calcFrom) / 1000;
+        return seconds * rps;
     }
 
     startMeeting() {
         const meetingId = this.props.match.params.id;
         console.log("starting meeting");
-        window.firebase.database().ref("/meetings/" + meetingId + "/started").set(new Date().toString(), (error) => {
+        window.firebase.database().ref("/meetings/" + meetingId + "/started").set(new Date().toISOString(), (error) => {
             if(error) {
                 console.log("error starting meeting ", error);
                 return;
@@ -77,7 +122,7 @@ class ViewMeeting extends Component {
     endMeeting() {
         const meetingId = this.props.match.params.id;
         console.log("ending meeting");
-        window.firebase.database().ref("/meetings/" + meetingId + "/ended").set(new Date().toString(), (error) => {
+        window.firebase.database().ref("/meetings/" + meetingId + "/ended").set(new Date().toISOString(), (error) => {
             if(error) {
                 console.log("error ending meeting ", error);
                 return;
@@ -93,7 +138,7 @@ class ViewMeeting extends Component {
             id: this.props.user.id,
             name: this.props.user.name,
             rate: this.props.user.rate,
-            joined: (new Date()).toString()
+            joined: (new Date()).toISOString()
         }
         window.firebase.database().ref("/meetings/" + meetingId + "/attendees/" + this.props.user.id).set(user, (error) => {
             if(error) {
@@ -116,6 +161,7 @@ class ViewMeeting extends Component {
                     <QRCode value={this.props.match.params.id} />
                 </div>
                 <p>{this.state.meeting.name}</p>
+                <p>Cost: {this.state.cost}</p>
                 <p>Created by {this.state.meeting.user.name} on {this.state.meeting.created}</p>
                 { 
                     !this.state.meeting.started ? 
@@ -136,7 +182,7 @@ class ViewMeeting extends Component {
                 }
                 <ul>
                     {
-                        this.state.meeting.attendees.map((a) => <li key={a.id}>{a.name}</li>)
+                        this.state.meeting.attendees.map((a) => <li key={a.id}>{a.name} (joined {a.joined})</li>)
                     }
                 </ul>
             </div> :

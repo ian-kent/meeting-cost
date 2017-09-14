@@ -38,7 +38,7 @@ class CreateMeeting extends Component {
                 const meeting = {
                     uid: userData.uid,
                     name: this.state.name,
-                    created: (new Date()).toString(),
+                    created: (new Date()).toISOString(),
                     user: {
                         id: this.props.user.id,
                         name: this.props.user.name
